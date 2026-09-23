@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mon suivi — MichelasTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16231F; --ink-soft:#48564F; --ink-faint:#8A9690;
+    --paper:#EEF1EC; --panel:#FFFFFF;
+    --primary:#1F5D50; --primary-dark:#153F37; --accent:#B8742A;
+    --line:#C7CFC3; --line-strong:#9AA79E;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  header{border-bottom:1px solid var(--line);background:var(--panel);}
+  .bar{max-width:760px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);}
+  .brand-mark{width:30px;height:30px;border-radius:6px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;}
+  .brand-name{font-weight:600;font-size:15px;}
+  .signout{font-size:12.5px;color:var(--ink-soft);background:none;border:1px solid var(--line-strong);border-radius:5px;padding:7px 12px;cursor:pointer;}
+  .wrap{max-width:760px;margin:0 auto;padding:32px 24px 80px;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .sub{font-size:13px;color:var(--ink-soft);margin:0 0 28px;}
+
+  .ticket{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:6px;padding:22px 24px;margin-bottom:20px;}
+  .ticket-top{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:14px;margin-bottom:16px;}
+  .field-label{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.05em;color:var(--ink-faint);margin-bottom:4px;}
+  .ticket-device{font-weight:600;font-size:15px;}
+  .status-track{display:flex;align-items:center;margin:6px 0 4px;}
+  .status-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+  .status-dot{width:11px;height:11px;border-radius:50%;background:var(--panel);border:2px solid var(--line-strong);z-index:1;}
+  .status-step.done .status-dot{background:var(--primary);border-color:var(--primary);}
+  .status-step.active .status-dot{background:var(--accent);border-color:var(--accent);}
+  .status-line{position:absolute;top:5px;left:calc(-50% + 6px);right:calc(50% + 6px);height:2px;background:var(--line-strong);z-index:0;}
+  .status-step.done .status-line,.status-step.active .status-line{background:var(--primary);}
+  .status-step:first-child .status-line{display:none;}
+  .status-label{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--ink-faint);margin-top:8px;text-align:center;}
+  .status-step.done .status-label,.status-step.active .status-label{color:var(--ink);}
+  .ticket-note{font-size:13px;margin-top:18px;color:var(--ink-soft);}
+  .updated{font-size:11px;color:var(--ink-faint);margin-top:10px;}
+  .empty{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:40px 24px;text-align:center;color:var(--ink-faint);font-size:13.5px;}
+</style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a href="index.html" class="brand">
+        <div class="brand-mark">MT</div>
+        <div class="brand-name">MichelasTech</div>
+      </a>
+      <button class="signout" id="signOutBtn">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <h1>Mon suivi</h1>
+    <p class="sub" id="whoAmI">Chargement…</p>
+    <div id="list"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const STEPS = [
+      {key:"depose", label:"Déposé"},
+      {key:"diagnostique", label:"Diagnostiqué"},
+      {key:"reparation", label:"Réparation"},
+      {key:"pret", label:"Prêt"}
+    ];
+    const list = document.getElementById("list");
+
+    auth.onAuthStateChanged((user) => {
+      if(!user){ window.location.href = "login.html"; return; }
+      if(user.email === ADMIN_EMAIL){ window.location.href = "admin.html"; return; }
+      document.getElementById("whoAmI").textContent = "Connecté en tant que " + user.email;
+      listenMyInterventions(user.email);
+    });
+
+    document.getElementById("signOutBtn").addEventListener("click", () => auth.signOut());
+
+    function listenMyInterventions(email){
+      db.collection("interventions").where("clientEmail", "==", email)
+        .onSnapshot((snap) => {
+          if(snap.empty){
+            list.innerHTML = '<div class="empty">Aucune intervention en cours pour le moment.</div>';
+            return;
+          }
+          const docs = [];
+          snap.forEach(doc => docs.push(doc.data()));
+          docs.sort((a,b) => (b.updatedAt?.seconds||0) - (a.updatedAt?.seconds||0));
+          list.innerHTML = "";
+          docs.forEach(data => list.appendChild(renderTicket(data)));
+        }, (err) => {
+          list.innerHTML = '<div class="empty">Impossible de charger vos dossiers pour le moment.</div>';
+          console.error(err);
+        });
+    }
+
+    function renderTicket(data){
+      const currentIndex = STEPS.findIndex(s => s.key === data.status);
+      const wrap = document.createElement("div");
+      wrap.className = "ticket";
+
+      const top = document.createElement("div");
+      top.className = "ticket-top";
+      top.innerHTML = `
+        <div><div class="field-label">MATÉRIEL</div><div class="ticket-device">${escapeHtml(data.device || "")}</div></div>
+      `;
+      wrap.appendChild(top);
+
+      const track = document.createElement("div");
+      track.className = "status-track";
+      STEPS.forEach((step, i) => {
+        const el = document.createElement("div");
+        el.className = "status-step" + (i < currentIndex ? " done" : i === currentIndex ? " active" : "");
+        el.innerHTML = `<div class="status-line"></div><div class="status-dot"></div><div class="status-label">${step.label}</div>`;
+        track.appendChild(el);
+      });
+      wrap.appendChild(track);
+
+      if(data.note){
+        const note = document.createElement("div");
+        note.className = "ticket-note";
+        note.textContent = data.note;
+        wrap.appendChild(note);
+      }
+
+      if(data.updatedAt){
+        const updated = document.createElement("div");
+        updated.className = "updated";
+        const d = new Date(data.updatedAt.seconds * 1000);
+        updated.textContent = "Mis à jour le " + d.toLocaleDateString("fr-FR") + " à " + d.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"});
+        wrap.appendChild(updated);
+      }
+
+      return wrap;
+    }
+
+    function escapeHtml(str){
+      const div = document.createElement("div");
+      div.innerText = str == null ? "" : str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

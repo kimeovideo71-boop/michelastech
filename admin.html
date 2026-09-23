@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Administration — MichelasTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16231F; --ink-soft:#48564F; --ink-faint:#8A9690;
+    --paper:#EEF1EC; --panel:#FFFFFF;
+    --primary:#1F5D50; --primary-dark:#153F37; --accent:#B8742A;
+    --line:#C7CFC3; --line-strong:#9AA79E; --danger:#A6432E;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;}
+  .mono{font-family:"IBM Plex Mono",monospace;}
+  header{border-bottom:1px solid var(--line);background:var(--panel);}
+  .bar{max-width:960px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);}
+  .brand-mark{width:30px;height:30px;border-radius:6px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:13px;}
+  .brand-name{font-weight:600;font-size:15px;}
+  .who{font-size:12.5px;color:var(--ink-soft);}
+  .signout{font-size:12.5px;color:var(--ink-soft);background:none;border:1px solid var(--line-strong);border-radius:5px;padding:7px 12px;cursor:pointer;margin-left:12px;}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 24px 80px;}
+  h1{font-size:20px;margin:0 0 4px;}
+  .sub{font-size:13px;color:var(--ink-soft);margin:0 0 28px;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:22px 24px;margin-bottom:28px;}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);margin:0 0 16px;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .form-row label{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px;}
+  .form-row input,.form-row select,.form-row textarea{
+    width:100%;font-family:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--line-strong);border-radius:5px;background:var(--panel);color:var(--ink);
+  }
+  .form-row{margin-bottom:14px;}
+  .full{grid-column:1 / -1;}
+  button.primary{font-family:inherit;font-size:13.5px;font-weight:600;padding:10px 18px;border-radius:5px;border:1px solid var(--primary);background:var(--primary);color:#fff;cursor:pointer;}
+  button.primary:hover{background:var(--primary-dark);}
+
+  table{width:100%;border-collapse:collapse;}
+  thead th{text-align:left;font-size:11px;text-transform:uppercase;color:var(--ink-faint);border-bottom:1px solid var(--line);padding:8px 10px;}
+  tbody td{padding:10px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  tbody td.small{font-size:11.5px;color:var(--ink-faint);}
+  select.status-select{font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 8px;border-radius:5px;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);}
+  .del{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:14px;}
+  .del:hover{color:var(--danger);}
+  .empty{color:var(--ink-faint);font-size:13px;padding:20px 0;text-align:center;}
+  .msg{font-size:12.5px;margin-top:12px;padding:9px 12px;border-radius:5px;display:none;}
+  .msg.error{display:block;background:color-mix(in srgb, var(--danger) 12%, transparent);color:var(--danger);}
+  .msg.ok{display:block;background:color-mix(in srgb, var(--primary) 12%, transparent);color:var(--primary-dark);}
+  #gate{max-width:420px;margin:80px auto;text-align:center;font-size:14px;color:var(--ink-soft);}
+</style>
+</head>
+<body>
+  <div id="gate" style="display:none;">Vérification de l'accès…</div>
+
+  <div id="app" style="display:none;">
+    <header>
+      <div class="bar">
+        <a href="index.html" class="brand">
+          <div class="brand-mark">MT</div>
+          <div class="brand-name">MichelasTech — Admin</div>
+        </a>
+        <div>
+          <span class="who" id="whoAmI"></span>
+          <button class="signout" id="signOutBtn">Déconnexion</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <h1>Interventions</h1>
+      <p class="sub">Créez un dossier pour un client et faites évoluer son statut — il le voit en temps réel depuis son espace.</p>
+
+      <div class="panel">
+        <h2>Nouvelle intervention</h2>
+        <form id="newForm">
+          <div class="grid">
+            <div class="form-row">
+              <label>Email du client (doit avoir un compte)</label>
+              <input id="fClientEmail" type="email" required placeholder="client@exemple.fr">
+            </div>
+            <div class="form-row">
+              <label>Nom du client</label>
+              <input id="fClientName" type="text" required placeholder="Nom Prénom">
+            </div>
+            <div class="form-row">
+              <label>Matériel</label>
+              <input id="fDevice" type="text" required placeholder="Ex : PC portable Dell Inspiron">
+            </div>
+            <div class="form-row">
+              <label>Statut initial</label>
+              <select id="fStatus">
+                <option value="depose">Déposé</option>
+                <option value="diagnostique">Diagnostiqué</option>
+                <option value="reparation">Réparation</option>
+                <option value="pret">Prêt</option>
+              </select>
+            </div>
+            <div class="form-row full">
+              <label>Note pour le client (optionnel)</label>
+              <textarea id="fNote" rows="2" placeholder="Ex : disque SSD remplacé, transfert des données en cours"></textarea>
+            </div>
+          </div>
+          <button type="submit" class="primary">Créer le dossier</button>
+          <div class="msg" id="newMsg"></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Dossiers en cours</h2>
+        <table>
+          <thead>
+            <tr><th>Client</th><th>Matériel</th><th>Statut</th><th>Note</th><th></th></tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+        <div class="empty" id="emptyState" style="display:none;">Aucune intervention pour le moment.</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script>
+    const STATUS_LABELS = {depose:"Déposé", diagnostique:"Diagnostiqué", reparation:"Réparation", pret:"Prêt"};
+    const rowsEl = document.getElementById("rows");
+    const emptyState = document.getElementById("emptyState");
+    let unsubscribe = null;
+
+    auth.onAuthStateChanged((user) => {
+      const gate = document.getElementById("gate");
+      const app = document.getElementById("app");
+      if(!user){
+        window.location.href = "login.html";
+        return;
+      }
+      if(user.email !== ADMIN_EMAIL){
+        window.location.href = "client.html";
+        return;
+      }
+      gate.style.display = "none";
+      app.style.display = "block";
+      document.getElementById("whoAmI").textContent = user.email;
+      listenInterventions();
+    });
+
+    document.getElementById("signOutBtn").addEventListener("click", () => auth.signOut());
+
+    function listenInterventions(){
+      if(unsubscribe) unsubscribe();
+      unsubscribe = db.collection("interventions").orderBy("updatedAt", "desc")
+        .onSnapshot((snap) => {
+          rowsEl.innerHTML = "";
+          emptyState.style.display = snap.empty ? "block" : "none";
+          snap.forEach((doc) => rowsEl.appendChild(renderRow(doc.id, doc.data())));
+        }, (err) => console.error(err));
+    }
+
+    function renderRow(id, data){
+      const tr = document.createElement("tr");
+      const td = (html) => { const el = document.createElement("td"); el.innerHTML = html; return el; };
+
+      const clientCell = td(`<strong>${escapeHtml(data.clientName || "")}</strong><br><span class="small">${escapeHtml(data.clientEmail || "")}</span>`);
+      const deviceCell = td(escapeHtml(data.device || ""));
+
+      const statusTd = document.createElement("td");
+      const select = document.createElement("select");
+      select.className = "status-select";
+      Object.entries(STATUS_LABELS).forEach(([val, label]) => {
+        const opt = document.createElement("option");
+        opt.value = val; opt.textContent = label;
+        if(data.status === val) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener("change", () => updateStatus(id, select.value));
+      statusTd.appendChild(select);
+
+      const noteCell = td(`<span class="small">${escapeHtml(data.note || "—")}</span>`);
+
+      const actionTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.className = "del";
+      delBtn.textContent = "✕";
+      delBtn.title = "Supprimer";
+      delBtn.addEventListener("click", () => {
+        if(confirm("Supprimer ce dossier ?")) db.collection("interventions").doc(id).delete();
+      });
+      actionTd.appendChild(delBtn);
+
+      tr.append(clientCell, deviceCell, statusTd, noteCell, actionTd);
+      return tr;
+    }
+
+    async function updateStatus(id, status){
+      await db.collection("interventions").doc(id).update({
+        status, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    function escapeHtml(str){
+      const div = document.createElement("div");
+      div.innerText = str == null ? "" : str;
+      return div.innerHTML;
+    }
+
+    document.getElementById("newForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById("newMsg");
+      msg.className = "msg";
+      try{
+        await db.collection("interventions").add({
+          clientEmail: document.getElementById("fClientEmail").value.trim().toLowerCase(),
+          clientName: document.getElementById("fClientName").value.trim(),
+          device: document.getElementById("fDevice").value.trim(),
+          status: document.getElementById("fStatus").value,
+          note: document.getElementById("fNote").value.trim(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        e.target.reset();
+        msg.textContent = "Dossier créé.";
+        msg.className = "msg ok";
+      } catch(err){
+        msg.textContent = "Erreur : " + err.message;
+        msg.className = "msg error";
+      }
+    });
+  </script>
+</body>
+</html>

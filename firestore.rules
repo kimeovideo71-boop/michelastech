@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "michelastech@gmail.com";
+    }
+    match /interventions/{id} {
+      // L'admin peut tout lire. Un client ne peut lire QUE ses propres dossiers.
+      allow read: if request.auth != null &&
+                     (isAdmin() || resource.data.clientEmail == request.auth.token.email);
+      // Seul l'admin peut créer, modifier ou supprimer un dossier.
+      allow create, update, delete: if isAdmin();
+    }
+  }
+}

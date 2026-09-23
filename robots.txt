@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /client.html
+
+Sitemap: https://www.michelastech.fr/sitemap.xml

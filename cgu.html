@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conditions générales d'utilisation — MichelasTech</title>
+<meta name="description" content="Conditions générales d'utilisation du site et de l'espace client MichelasTech.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .legal{max-width:760px;margin:0 auto;padding:48px 24px 90px;}
+  .legal h1{font-size:26px;}
+  .legal .updated{font-size:12.5px;color:var(--ink-faint);margin-bottom:32px;}
+  .legal h2{font-size:16px;margin-top:36px;color:var(--primary-light);}
+  .legal ul{color:var(--ink-soft);font-size:14px;padding-left:20px;}
+  .legal li{margin-bottom:6px;}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="navbar">
+    <a href="index.html" class="brand">
+      <img src="logo-icon.webp" alt="Logo MichelasTech" width="34" height="34">
+      <div class="brand-name">Michelas<b>Tech</b></div>
+    </a>
+    <nav class="links" id="navLinks">
+      <a href="index.html#services">Services</a>
+      <a href="index.html#tarifs">Tarifs</a>
+      <a href="index.html#contact" class="btn btn-primary">Demander un diagnostic</a>
+    </nav>
+    <button class="navburger" id="navBurger" aria-label="Ouvrir le menu"><span></span></button>
+  </div>
+</header>
+
+<main class="legal">
+  <div class="field-label">Document légal</div>
+  <h1>Conditions générales d'utilisation</h1>
+  <p class="updated">Dernière mise à jour : 23 septembre 2026</p>
+
+  <p>Les présentes CGU régissent l'utilisation du site michelastech.fr et de son espace client, édité par MichelasTech, entreprise individuelle — SIRET [numéro] — michelastech@gmail.com.</p>
+
+  <h2>1. Objet du site</h2>
+  <p>Ce site présente les services de réparation d'ordinateurs proposés par MichelasTech et permet de demander un diagnostic. L'espace client permet de suivre l'état d'avancement d'une réparation en cours.</p>
+
+  <h2>2. Création de compte</h2>
+  <p>La création d'un compte client est gratuite et suppose la fourniture d'une adresse email valide et d'un mot de passe. Vous êtes responsable de la confidentialité de vos identifiants. MichelasTech ne vous demandera jamais votre mot de passe par email ou téléphone.</p>
+
+  <h2>3. Accès aux dossiers de réparation</h2>
+  <p>Chaque dossier de réparation est créé et mis à jour uniquement par l'administrateur de MichelasTech. Un client ne peut consulter que les dossiers associés à sa propre adresse email.</p>
+
+  <h2>4. Devis et tarifs</h2>
+  <p>Les tarifs affichés sur le site sont indicatifs. Un devis précis et gratuit est systématiquement établi avant toute intervention payante. Aucun paiement n'est exigé sans accord préalable du client.</p>
+
+  <h2>5. Responsabilité</h2>
+  <p>MichelasTech met tout en œuvre pour assurer l'exactitude des informations publiées sur ce site, sans garantir l'absence d'erreur. MichelasTech ne saurait être tenu responsable d'une indisponibilité temporaire du site ou de l'espace client.</p>
+
+  <h2>6. Propriété intellectuelle</h2>
+  <p>Le nom, le logo et les contenus du site MichelasTech sont la propriété de MichelasTech. Toute reproduction sans autorisation est interdite.</p>
+
+  <h2>7. Droit applicable</h2>
+  <p>Les présentes CGU sont soumises au droit français. En cas de litige, une solution amiable sera recherchée en priorité avant toute action judiciaire.</p>
+
+  <h2>8. Contact</h2>
+  <p>Pour toute question relative aux présentes CGU : michelastech@gmail.com</p>
+</main>
+
+<footer class="site">
+  <div class="container footer-grid">
+    <div class="mono">MichelasTech — Réparation d'ordinateurs</div>
+    <div class="footer-links">
+      <a href="index.html">Accueil</a>
+      <a href="cgu.html">CGU</a>
+      <a href="rgpd.html">Confidentialité</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  var burger = document.getElementById("navBurger");
+  var links = document.getElementById("navLinks");
+  burger.addEventListener("click", function(){ links.classList.toggle("open"); });
+</script>
+<script src="cookie-consent.js"></script>
+</body>
+</html>

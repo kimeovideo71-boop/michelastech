@@ -5,13 +5,15 @@
 // La vraie sécurité vient des règles Firestore, pas de ce fichier.
 // ============================================================
 const firebaseConfig = {
-  apiKey: "VOTRE_API_KEY",
-  authDomain: "VOTRE_PROJET.firebaseapp.com",
-  projectId: "VOTRE_PROJET",
-  storageBucket: "VOTRE_PROJET.appspot.com",
-  messagingSenderId: "VOTRE_SENDER_ID",
-  appId: "VOTRE_APP_ID"
+  apiKey: "AIzaSyA5MT2c-BK02oXjAA21A-0AUeut7ikOEM4",
+  authDomain: "michelastechrepa.firebaseapp.com",
+  projectId: "michelastechrepa",
+  storageBucket: "michelastechrepa.firebasestorage.app",
+  messagingSenderId: "586996255894",
+  appId: "1:586996255894:web:a9a653de852801c93e86b7",
+  measurementId: "G-4K4DV4MGWF"
 };
+
 
 // L'email qui doit avoir les droits administrateur.
 const ADMIN_EMAIL = "michelastech@gmail.com";
